@@ -6,7 +6,9 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CreateUserDto } from 'src/dtos/create-user.dto';
 import { UpdateUserDto } from 'src/dtos/update-user.dto';
 import { UserInterface } from 'src/interfaces/user.interface';
@@ -21,6 +23,7 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   async findAll(): Promise<UserInterface[]> {
     return await this.userService.findAll();
@@ -29,6 +32,11 @@ export class UserController {
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<UserInterface> {
     return await this.userService.findOne(id);
+  }
+
+  @Get('email/:email')
+  async findByEmail(@Param('email') email: string): Promise<UserInterface> {
+    return await this.userService.findByEmail(email);
   }
 
   @Put(':id')

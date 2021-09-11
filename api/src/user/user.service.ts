@@ -34,10 +34,21 @@ export class UserService {
     return user;
   }
 
+  // Refactoring
+  async findByEmail(email: string): Promise<UserInterface | undefined> {
+    return await this.userModel.findOne({ email });
+  }
+
   async update(
     id: string,
     updateUserDto: UpdateUserDto,
   ): Promise<UserInterface> {
+    const user = await this.userModel.findById(id);
+
+    if (!user) {
+      throw new NotFoundException(`User With ID ${id} not found`);
+    }
+
     return await this.userModel.findByIdAndUpdate(id, updateUserDto, {
       new: true,
     });
