@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { model, Model } from 'mongoose';
 import { CreateUserDto } from 'src/dtos/create-user.dto';
 import { UserInterface } from 'src/interfaces/user.interface';
-import { User } from 'src/schemas/user.schema';
+import { User, UserSchema } from 'src/schemas/user.schema';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from 'src/dtos/update-user.dto';
 
@@ -14,10 +14,14 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserInterface> {
-    const hash = await bcrypt.hash(createUserDto.password, 10);
-    createUserDto.password = hash;
+    createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
     const user = new this.userModel(createUserDto);
     return await user.save();
+  }
+
+  async createMany(createUserDto: CreateUserDto[]): Promise<any> {
+    const UserSave = model(User.name, UserSchema);
+    return await UserSave.insertMany(createUserDto);
   }
 
   async findAll(): Promise<UserInterface[]> {

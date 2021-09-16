@@ -9,6 +9,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { hasRoles, Role } from 'src/auth/roles/roles.decorator';
+import { RolesGuard } from 'src/auth/roles/roles.guard';
 import { CreateUserDto } from 'src/dtos/create-user.dto';
 import { UpdateUserDto } from 'src/dtos/update-user.dto';
 import { UserInterface } from 'src/interfaces/user.interface';
@@ -23,7 +25,15 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @Post('create_many')
+  async createMany(
+    @Body() createUserDto: CreateUserDto[],
+  ): Promise<UserInterface> {
+    return this.userService.createMany(createUserDto);
+  }
+
+  @hasRoles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard) 
   @Get()
   async findAll(): Promise<UserInterface[]> {
     return await this.userService.findAll();
