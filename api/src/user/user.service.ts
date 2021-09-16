@@ -19,6 +19,7 @@ export class UserService {
     return await user.save();
   }
 
+  // Não funciona
   async createMany(createUserDto: CreateUserDto[]): Promise<any> {
     const UserSave = model(User.name, UserSchema);
     return await UserSave.insertMany(createUserDto);
