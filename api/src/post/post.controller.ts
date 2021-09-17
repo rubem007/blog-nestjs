@@ -7,8 +7,12 @@ import {
   Post,
   Put,
   Request,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { hasRoles, Role } from 'src/auth/roles/roles.decorator';
 import { RolesGuard } from 'src/auth/roles/roles.guard';
@@ -16,6 +20,21 @@ import { CreatePostDto } from 'src/dtos/create-post.dto';
 import { UpdatePostDto } from 'src/dtos/update-post.dto';
 import { PostInterface } from 'src/interfaces/post.interface';
 import { PostService } from './post.service';
+import { v4 as uuidv4 } from 'uuid';
+import path = require('path');
+
+export const storage = {
+  storage: diskStorage({
+    destination: './uploads/posts',
+    filename: (req, file, cb) => {
+      const filename: string =
+        path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
+      const extension: string = path.parse(file.originalname).ext;
+
+      cb(null, `${filename}${extension}`);
+    },
+  }),
+};
 
 @Controller('posts')
 export class PostController {
@@ -60,5 +79,11 @@ export class PostController {
   @Delete(':id')
   async delete(@Param('id') id: string): Promise<PostInterface> {
     return await this.postService.delete(id);
+  }
+
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file', storage))
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
+    console.log(file);
   }
 }

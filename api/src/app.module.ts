@@ -7,10 +7,10 @@ import { AppController } from './app.controller';
 import { PostModule } from './post/post.module';
 
 @Module({
-  imports: [
+  imports: [ 
     ConfigModule.forRoot({ isGlobal: true }),
     UserModule,
-    MongooseModule.forRoot(process.env.DB_URI),
+    MongooseModule.forRoot(process.env.MONGO_DB_URI),
     AuthModule,
     PostModule,
   ],

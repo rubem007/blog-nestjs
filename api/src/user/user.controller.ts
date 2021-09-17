@@ -32,8 +32,6 @@ export class UserController {
     return this.userService.createMany(createUserDto);
   }
 
-  @hasRoles(Role.ADMIN)
-  @UseGuards(JwtAuthGuard, RolesGuard) 
   @Get()
   async findAll(): Promise<UserInterface[]> {
     return await this.userService.findAll();
